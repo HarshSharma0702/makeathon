@@ -8,3 +8,4 @@ class Ingredeint(BaseModel):
 class Product(BaseModel):
     product: str
     report: list[Ingredeint]
+    

@@ -33,7 +33,7 @@ app.add_middleware(
 """
 incude the routing details of service
 """
-app.include_router(router, prefix='/api/v1', tags=['Infosys Responsible AI - fairness'])
+app.include_router(router, prefix='/api/v1', tags=['Infosys Makeathon - Apex'])
 
 
 

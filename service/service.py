@@ -31,18 +31,19 @@ class ApexService:
         model1=genai.GenerativeModel("gemini-pro-vision")
 
         model2=genai.GenerativeModel(model_name="gemini-pro", generation_config={
-          "temperature": 0.3  # Set the temperature to 0.3
+          "temperature": 0.3 , # Set the temperature to 0.3
           # "top_p": 1,
           # "top_k": 32,
-          # "max_output_tokens": 2048
+          "max_output_tokens": 2048
          })
         prompt_template4 = """
             "input": "{input_placeholder}",
             "information": "the input contains a comma seperated string containing names of different ingredients"
             "context": "You are an advanced AI trained to evaluate the ingredients provided",
-            "task": "Analyze all the ingredients provided in the input for allergic content",
+            "task": "Analyze at max 15 important ingredients provided in the input for allergic content",
             "instruction": "Identify the allergies caused by each ingredients if any and give detailed explaination of the symptoms caused by these allergies",
-            "instruction": "follow the below output format and the output should be in a valid json format",
+            "instruction": "follow the below output format and the output should be strictly in a valid json format",
+            "instruction": "the output should contain maximum 15 most important ingredients",
             "output-format": "
               [
                   "ingredient": [the value here should be the name of the ingredient],
@@ -122,7 +123,9 @@ class ApexService:
             "information": "the input2 contains the information of a patient about his allergies and allergens"
             "context": "You are an advanced AI trained to evaluate if any ingredient from the product is harmfull for the patient or not",
             "task": "Analyze both the inputs and generate a report describing if the product is harmful for the patient or not",
-            "output": "should be an detailed explaination why this product is harmful for the patient"
+            "information": "If the product is harmfull for the patient then you should describe which ingredient of the product is harmfull for the patient and why"
+            "information": "If the product is not harmfull for the patient then you should just explain if the product has some positive effect for the patient"
+            "output-format": "The output should be a string containing all the information".
             """
             response3=model2.generate_content(
                 prompt_template.format(input_placeholder1 = text, input_placeholder2=text2),
@@ -138,7 +141,7 @@ class ApexService:
             text3= str(response3.text)
     
 
-
+        text3 = text3.replace("json", "")
         print(text3)
 
         response2=model2.generate_content(
@@ -153,16 +156,15 @@ class ApexService:
         )
         response2.resolve() 
         res=response2.text
+        print(res)
         res= json.loads(res)
         res_obj = {
             "ingredients": res,
             "product_name": name,
             "explaination": text3
         }
-        print(type(res))
+
         ingredients = [Ingredeint(**item) for item in res]
         product = Product(product=name, report=ingredients)
         self.apex_collection.insert_one(product.model_dump())
         return res_obj
-
-        

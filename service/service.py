@@ -28,7 +28,7 @@ class ApexService:
         
         return res
     def apexAdd(self,name,img, img2):
-        model1=genai.GenerativeModel("gemini-pro-vision")
+        model1=genai.GenerativeModel("gemini-1.5-flash")
 
         model2=genai.GenerativeModel(model_name="gemini-pro", generation_config={
           "temperature": 0.3 , # Set the temperature to 0.3
